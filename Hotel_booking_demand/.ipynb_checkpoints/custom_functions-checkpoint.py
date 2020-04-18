@@ -68,7 +68,8 @@ def hist_boxplot(df):
             
 
 def classifier_gridCV(X_train, y_train, clf, 
-                      X_test = None, y_test = None, cv = 3, scoring = 'accuracy', params = {}, model_name = "model"):
+                      X_test = None, y_test = None, cv = 3,
+                      scoring = 'accuracy', params = {}, model_name = "model"):
     
     grid = GridSearchCV(clf, params, cv = cv, scoring = scoring, refit = True)
     
