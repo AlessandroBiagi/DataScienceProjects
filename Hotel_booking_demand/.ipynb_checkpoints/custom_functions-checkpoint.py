@@ -4,23 +4,23 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import precision_score, recall_score, accuracy_score
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import GridSearchCV, StratifiedKFold
 from pandas.api.types import is_numeric_dtype, is_string_dtype
 from scipy.stats import chi2_contingency
 from statsmodels.formula.api import ols
 from statsmodels.stats.anova import anova_lm
-from sklearn.model_selection import StratifiedKFold
 
-
-
-
-
-
-
+# We change a setting just to avoid an annoying warning
 pd.set_option('display.max_rows', 100)
 
-
+# We are goint to define 5 functions
+# Number 1
 def value_counts_csv(df):
+    
+    """
+    This function returns a .csv for every column of a pandas DataFrame. The goal is to show the frequency and the relative frequency of every non-null value of the column.
+    """
+    
     assert isinstance(df, pd.DataFrame)
     
     if not os.path.exists('value_counts_csv'):
@@ -35,8 +35,13 @@ def value_counts_csv(df):
         
         value_counts.to_csv('./value_counts_csv/'+col+'.csv', index = False)
 
-        
+# Number 2        
 def count_nulls(df):
+    
+    """
+    This function return a .csv for a given pandas DataFrame. The goal is to show the frequency and the relative frequency of null values for every column.
+    """
+    
     assert isinstance(df, pd.DataFrame)
     
     if not os.path.exists('./value_counts_csv/Nulls_folder'):
@@ -50,8 +55,13 @@ def count_nulls(df):
         
     nulls.to_csv('./value_counts_csv/Nulls_folder/Nulls.csv', index = False)
     
-
+# Number 3
 def hist_boxplot(df):
+    
+    """
+    This function return a .png file for every column of a given pandas DataFrame. The goal is to give a look at the distributions of the features. In case of a categorical feature, only a histogram is provided. If the feature is numerical, also a boxplot is shown.
+    """
+    
     assert isinstance(df, pd.DataFrame)
     
     if not os.path.exists('plots/distribution'):
@@ -74,11 +84,15 @@ def hist_boxplot(df):
             fig.savefig('plots/distribution/' + col)
             plt.close(fig)
             
-
+# Number 4
 def classifier_gridCV(X_train, y_train, clf, 
                       X_test = None, y_test = None, cv = 5,
                       scoring = 'accuracy', params = {}, model_name = "model",
                      random_state=123):
+    
+    """
+    The goal of this function is to train and validate a binary classifier using the Cross-Validation method together with GridSearch. It returns a .csv with the results of the Cross-Validation scores. Moreover, the function test the performance of the model on a test dataset (if this is provided) and it prints the result.
+    """
     
     grid = GridSearchCV(clf, params, cv = StratifiedKFold(n_splits=cv, shuffle=True, random_state=random_state), scoring = scoring, refit = True, n_jobs=-1)
     
@@ -111,17 +125,17 @@ def classifier_gridCV(X_train, y_train, clf,
             
     return(model)
 
-# numerical vs numerical: Pearson and Spearman [-1,1]
-# categorical vs numerical: eta correlation (anova test) [0,1]
-# categorical vs categorical: cramer's v (chi-squared test) [0,1]
-# check if our metrics are symmetric: correlation and cramer yes
-
+# Number 5
 def correlation_matrix(df, method_numeric='pearson'):
     
     """
-    Comment here
-    
+    The goal of this function is to show some correlation and association scores between the features of a given pandas DataFrame, accorind to the following logic:
+    - numerical vs numerical: Pearson or Spearman [-1,1]
+    - categorical vs numerical: eta correlation (anova test) [0,1]
+    - categorical vs categorical: cramer's v (chi-squared test) [0,1]
+    The function returns a matrix with all the results and properly coloured according to the kind of test.
     """
+    
     l = df.shape[1]
     matrix = np.zeros(shape=(l,l))
     matrix_mask = np.zeros(shape=(l,l))
