@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.metrics import precision_score, recall_score, accuracy_score
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from sklearn.model_selection import GridSearchCV, StratifiedKFold
 from pandas.api.types import is_numeric_dtype, is_string_dtype
 from scipy.stats import chi2_contingency
@@ -85,16 +85,16 @@ def hist_boxplot(df):
             plt.close(fig)
             
 # Number 4
-def classifier_gridCV(X_train, y_train, clf, 
+def regressor_gridCV(X_train, y_train, reg, 
                       X_test = None, y_test = None, cv = 5,
-                      scoring = 'accuracy', params = {}, model_name = "model",
+                      scoring = 'neg_mean_squared_error', params = {}, model_name = "model",
                      random_state=123):
     
     """
     The goal of this function is to train and validate a binary classifier using the Cross-Validation method together with GridSearch. It returns a .csv with the results of the Cross-Validation scores. Moreover, the function test the performance of the model on a test dataset (if this is provided) and it prints the result.
     """
     
-    grid = GridSearchCV(clf, params, cv = StratifiedKFold(n_splits=cv, shuffle=True, random_state=random_state), scoring = scoring, refit = True, n_jobs=-1)
+    grid = GridSearchCV(reg, params, cv = StratifiedKFold(n_splits=cv, shuffle=True, random_state=random_state), scoring = scoring, refit = True, n_jobs=-1)
     
     model = grid.fit(X_train, y_train)
     print("The best parameters of grid are: ", model.best_params_, 
@@ -119,9 +119,10 @@ def classifier_gridCV(X_train, y_train, clf,
     
         if y_test is not None:
             print("The results on the test are: ")
-            print("Precision = {}".format(precision_score(y_test, results, average='macro')))
-            print("Recall = {}".format(recall_score(y_test, results, average='macro')))
-            print("Accuracy = {}".format(accuracy_score(y_test, results)))
+            print("MSE = {0:.10f}".format(mean_squared_error(y_test, results)))
+            print("RMSE = {0:.10f}".format(mean_squared_error(y_test, results)**0.5))
+            print("MAE = {0:.10f}".format(mean_absolute_error(y_test, results)))
+            print("R2 = {0:.10f}".format(r2_score(y_test, results)))
             
     return(model)
 
