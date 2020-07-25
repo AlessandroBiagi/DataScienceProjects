@@ -1,4 +1,4 @@
 .ipynb_*
-.DS_Store
+*/.DS_Store
 .gitattributes
-__pycache__
+*/__pycache__
