@@ -9,6 +9,7 @@ from pandas.api.types import is_numeric_dtype, is_string_dtype
 from scipy.stats import chi2_contingency
 from statsmodels.formula.api import ols
 from statsmodels.stats.anova import anova_lm
+from sklearn import preprocessing
 
 # We change a setting just to avoid an annoying warning
 pd.set_option('display.max_rows', 100)
@@ -150,19 +151,91 @@ def comparing_columns(df_left, df_right, col_left, col_right):
     values = set(df_left[col_left])
     df_right['Match'] = df_right[col_right].isin(values)
     print(df_right['Match'].value_counts())
+    return df_right['Match']
     
 # Number 8
 def plotting_random_grid(sample_size, df_sampled, df_filtered, key_col, col_x, col_y, x_ticks):
     """
-    Firstly, the function makes a sample of the DataFrame df_sampled according to key_col. After that, it uses every value of the sample to filter df_filtered and to plot a xy-chart of col_x and col_y, where col_x and col_y belongs to df_filtered. The number of points represented on the x-axis is given by x_ticks
+    Firstly, the function makes a sample of the DataFrame df_sampled according to key_col. 
+    After that, it uses every value of the sample to filter df_filtered and to plot a xy-chart of col_x and col_y, where col_x and col_y belongs to df_filtered. 
+    The number of points represented on the x-axis is given by x_ticks
+    Sample size should be a multiple of 3 in order to obtatin a suitable visualization
     """
+    if df_sampled.name == df_filtered.name:
+        last_directory_part = df_sampled.name
+    else:
+        last_directory_part = df_sampled.name + "-" + df_filtered.name
+    current_directory = 'plots/arima/' + last_directory_part
+    if not os.path.exists(current_directory):
+        os.makedirs(current_directory)
+        
     sample_key_val = df_sampled[key_col].sample(n=sample_size, random_state=234)
+    fig, axs = plt.subplots((sample_size // 3), 3, figsize=(20, 80))
     
-    fig, axs = plt.subplots(sample_size, figsize=(20, 80))
-    
-    for i in range(0, sample_size):
-        key_val = sample_key_val.iloc[i]
+    i = 0
+    for sample_val in range(0, sample_size):
+        j = sample_val % 3
+        key_val = sample_key_val.iloc[sample_val]
         df_example = df_filtered[df_filtered[key_col] == key_val]
-        axs[i].plot(df_example[col_x], df_example[col_y])
-        axs[i].set_xticks(range(0, x_ticks))
+        axs[i,j].plot(df_example[col_x], df_example[col_y])
+        axs[i,j].set_xticks(range(0, x_ticks))
+        fig.savefig(current_directory + "/" + key_col + "-" + col_x + "-" + col_y)
+        plt.close(fig)
+        if j == 2:
+            i = i+1
 
+# Number 9
+def building_unit_lags(df, df_lag, pk, time_col, value_col, lag_size):
+    """
+    
+    """
+    for i in range(1, lag_size+1):
+        df_to_merge = df.copy()
+        df_to_merge[time_col] = df_to_merge[time_col] + i
+        df_to_merge[value_col + '_lag_' + str(i)] = df_to_merge[value_col]
+        df_lag = df_lag.merge(df_to_merge[[value_col + '_lag_' + str(i), time_col, pk]],
+                                     left_on=[time_col, pk],
+                                     right_on=[time_col, pk],
+                                     how='left', suffixes=(None, None))
+    return df_lag
+
+# Number 10
+def creating_submission_lag(df_submission, df_xgb_sel, month):
+    """
+    """
+    df_submission_lag = df_xgb_sel.copy()
+    df_submission_lag = df_submission_lag[df_submission_lag['date_block_num'] == month]
+    df_submission_lag = df_submission_lag[['joined_fields', 'item_cnt_day']]
+    df_submission = df_submission.merge(df_submission_lag, how='left',
+                                        suffixes=('_left', 'right'), 
+                                        left_on='joined_fields', right_on='joined_fields')
+    return df_submission
+
+# Number 11
+def creating_submission_file(df_test, df_xgb_sel, month, rename_old, rename_new):
+    """
+    """
+    df_submission = creating_submission_lag(df_submission=df_test,
+                                           df_xgb_sel=df_xgb_sel, month=month)
+    df_submission = df_submission.rename(columns={rename_old: rename_new})
+    return df_submission
+
+# Number 12
+def numeric_encoding(df, col):
+    """
+    """
+    le = preprocessing.LabelEncoder()
+    le.fit(df[col])
+    col_numeric = le.transform(df[col])
+    df[col] = col_numeric
+    return df
+
+# Number 13
+def modifying_submission_format(df_submission, predictions):
+    """
+    """
+    df_submission['item_cnt_month'] = predictions
+    df_submission_final = df_submission.copy()
+    df_submission_final['ID'] = df_submission_final.index
+    df_submission_final = df_submission_final[['ID', 'item_cnt_month']]
+    return [df_submission, df_submission_final]
