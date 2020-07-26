@@ -1,2 +1,2 @@
 n_estimators;max_depth;learning_rate
-70;17;0.15
+100;6;0.300000012

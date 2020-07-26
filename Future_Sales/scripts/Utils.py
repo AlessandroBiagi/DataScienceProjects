@@ -187,7 +187,7 @@ def plotting_random_grid(sample_size, df_sampled, df_filtered, key_col, col_x, c
 # Number 9
 def building_unit_lags(df, df_lag, pk, time_col, value_col, lag_size):
     """
-    
+    This function creates a lag column for a dataset df_lag in input. The size of the lag step is given by lag_size
     """
     for i in range(1, lag_size+1):
         df_to_merge = df.copy()
@@ -202,6 +202,7 @@ def building_unit_lags(df, df_lag, pk, time_col, value_col, lag_size):
 # Number 10
 def creating_submission_lag(df_submission, df_xgb_sel, month):
     """
+    This function creates the lags columns on the dataframe we need to submit, so that we can apply our model and create a predictions column
     """
     df_submission_lag = df_xgb_sel.copy()
     df_submission_lag = df_submission_lag[df_submission_lag['date_block_num'] == month]
@@ -214,6 +215,7 @@ def creating_submission_lag(df_submission, df_xgb_sel, month):
 # Number 11
 def creating_submission_file(df_test, df_xgb_sel, month, rename_old, rename_new):
     """
+    This function apply the creating_submission_lag function to a dataset and renames the columns according to the input
     """
     df_submission = creating_submission_lag(df_submission=df_test,
                                            df_xgb_sel=df_xgb_sel, month=month)
