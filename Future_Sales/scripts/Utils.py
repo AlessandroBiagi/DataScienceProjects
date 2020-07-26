@@ -101,8 +101,8 @@ def regressor_gridCV(X_train, y_train, reg,
     print("The best parameters of grid are: ", model.best_params_, 
           "\nThe best estimator is: ", model.best_estimator_)
     
-    if not os.path.exists('Models/CV_results'):
-        os.makedirs('Models/CV_results')
+    if not os.path.exists('models/cv_results'):
+        os.makedirs('models/cv_results')
     
     cvres = model.cv_results_
     
@@ -113,7 +113,7 @@ def regressor_gridCV(X_train, y_train, reg,
     else: 
         dataframe = pd.DataFrame({"mean_test_score":cvres["mean_test_score"]})
             
-    dataframe.to_csv("./Models/CV_results/CV_results_"+model_name+".csv", index = False) 
+    dataframe.to_csv("./models/cv_results/" + model_name + ".csv", index = False) 
     
     if X_test is not None:
         results = model.predict(X_test)
@@ -223,6 +223,7 @@ def creating_submission_file(df_test, df_xgb_sel, month, rename_old, rename_new)
 # Number 12
 def numeric_encoding(df, col):
     """
+    Given a categorical column of a dataframe, the function performs a LabelEncoder transformation on it
     """
     le = preprocessing.LabelEncoder()
     le.fit(df[col])
@@ -233,9 +234,45 @@ def numeric_encoding(df, col):
 # Number 13
 def modifying_submission_format(df_submission, predictions):
     """
+    This function needs as input the result of the creating_submission_file function. Thererefore, it transforms the dataframe in the format
+    requested by Kaggle
     """
     df_submission['item_cnt_month'] = predictions
     df_submission_final = df_submission.copy()
     df_submission_final['ID'] = df_submission_final.index
     df_submission_final = df_submission_final[['ID', 'item_cnt_month']]
     return [df_submission, df_submission_final]
+
+# Number 14
+def parsing_trials_hp(trials, field):
+    """
+    By this function we parse the trials file given by hyperopt to obtain a visualization of the performance of the model with the tested hyperparameters
+    """
+    field_value = [t['misc']['vals'][field] for t in trials.trials]
+    loss = [t['result']['loss'] for t in trials.trials]
+    plt.xlabel(field)
+    plt.ylabel('Loss')
+    plt.title('Loss by ' + field)
+    plt.scatter(field_value, loss)
+    
+# Number 15    
+def current_time():
+    """
+    Function to print the current_time
+    """
+    from datetime import datetime
+    now = datetime.now()
+    current_time = now.strftime("%H:%M:%S")
+    print("Current Time =", current_time)
+
+# Number 16
+def extracting_parameters_xgb(xgb_model, model_name, fields, sep=';'):
+    """
+    Given an xgb model, we extract the desired parameters (listed in the fields input) and we save them on a csv file
+    """
+    params = xgb_model.get_params()
+    dict_dataframe = {}
+    for num, field in enumerate(fields):
+        dict_dataframe[field] = params[field]
+    df_params = pd.DataFrame(dict_dataframe, index=[0])
+    df_params.to_csv('models/hyperparameters/' + model_name + "_params", index=False, sep=sep)
