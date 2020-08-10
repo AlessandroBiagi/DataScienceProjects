@@ -20,4 +20,5 @@ Additional info: we provide a requirements.txt with some particular versions of 
 - After this, we proceed with a first **feature engineering** phase: we treated properly incorrect values, outliers etc.
 - Now we perform an **EDA** on the pairs (shop_id, item_id): we discover that we will need to predict item_cnt_day for a lot of pairs (shop_id, item_id) that our model will not be trained on
 - This implies another **feature engineering** phase where we treat properly the absent months for the pairs (shop_id, item_id).
-- So the first strategy that we apply is the naive one: we say that a given item will be sold in the same amount of the month before. Actually this strategy did not work so well when we tried to predict the month number 33 using the month 32 but we obtain a wonderful RMSE of 2.3708 wh
+- So the first **strategy** that we apply is the naive one: we say that a given item will be sold in the same amount of the month before. Actually this strategy did not work so well when we tried to predict the month number 33 using the month 32 but we obtain a wonderful RMSE of 2.37068 when we try to predict the items of the test set (we filled the unknown values with 0)
+- Then the goal is to apply some statistical models such as ARIMA or SARIMA to solve our problem.
