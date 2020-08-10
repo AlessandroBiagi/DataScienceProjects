@@ -1,3 +1,5 @@
+# Predict Future Sales
+
 This project is a classical Data Science problem regarding numerical regression, in particular prediction of future sales (you can find it on Kaggle, see the link below). Given some qualitative and historical features about the items, the goal is to predict how many times an item will be sold on the next month.
 
 Kind of project: Regression<br/> 
