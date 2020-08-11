@@ -4,15 +4,20 @@ This project is a classical Data Science problem regarding numerical regression,
 
 **Kind of project**: Regression <br>
 **Number of features**: 32 <br>
-**Target label**: item_cnt_day, numerical
-**Target metric**: RMSE as requested on the Kaggle web page
-**Final model**: models/saved_models/tuned_models/xgb_manual.sav, with RMSE of 2.14894%
-**Main code**: scripts/Predict_Future_Sales.ipynb
+**Target label**: item_cnt_day, numerical <br>
+**Target metric**: RMSE as requested on the Kaggle web page <br>
+**Final model**: models/saved_models/tuned_models/xgb_manual.sav, with RMSE of 2.14894% <br>
+**Main code**: scripts/Predict_Future_Sales.ipynb <br>
 
 Reference: This DataSet is public on Kaggle and you can find more details looking at https://www.kaggle.com/c/competitive-data-science-predict-future-sales
 
 ## Table of contents of this repository
-**models**:
+**models**: here we can find the results of some of our Cross-Validations, the hyperparameters of our model and the saved models themselves <br>
+**plots**: histograms and boxplots of the features<br>
+**scripts**: the main code as jupyter notebook and a python file of Utils for custom functions <br>
+**src**: here the source files are stored <br>
+**submissions**: the files that we submit on Kaggle <br>
+**requirements.txt
 Additional info: we provide a requirements.txt with some particular versions of xgboost and matplotlib that we require
 
 
@@ -24,7 +29,7 @@ Additional info: we provide a requirements.txt with some particular versions of 
 - This implies another **feature engineering** phase where we treat properly the absent months for the pairs (shop_id, item_id).
 - So the first **strategy** that we apply is the naive one: we say that a given item will be sold in the same amount of the month before. Actually this strategy did not work so well when we tried to predict the month number 33 using the month 32 but we obtain a wonderful RMSE of 2.37068 when we try to predict the items of the test set (we filled the unknown values with 0)
 - Then the goal is to apply some statistical models such as ARIMA or SARIMA to solve our problem. We extract randomly some observations in order to find some seasonalities. Since we find none of them, we discard SARIMA and we decide to try ARIMA for a fixed pair (shop_id, item_id). We build an ARIMA(1,1,1) model. Trying to predict the month number 33 using the previous 4 months, We got an RMSE of 9.372 which we consider high. Because of this, we do not feel confident to apply ARIMA(1,1,1) for other pairs for the moment and we proceed with another method
-- The second strategy is to build a XGBoost model where for every observation we add new features containing the item_cnt_day of the months before, i.e. we use some lagged data. In particular, we build lag-columns for the twelve months before. We also insert as new feature the item_price of the previous month. Before applying the model, we perform a RFECV study using a Random Forest to get an idea about the most relevant features. Due to our limited computational resources, we perform the RFECV only to the 5% of our dataset. Thanks to this we observe that the features about 1 and 12 months before are selected among the most important features, which totally makes sense. Using this information we make a selection of the columns to use as input for XGBoost. After the training, we submit the results on Kaggle obtaining an RMSE of 2.32279, which is better than the first strategy but we were hoping for better results
+- The second strategy is to build a XGBoost model where for every observation we add new features containing the item_cnt_day of the months before, i.e. we use some lagged data. In particular, we build lag-columns for the twelve months before. We also insert as new feature the item_price of the previous month. Before applying the model, we perform a RFECV study using a Random Forest to get an idea about the most relevant features. Due to our limited computational resources, we perform the RFECV only to the 5% of our dataset. Thanks to this we observe that the features about 1 and 12 months before are selected among the most important features, which totally makes sense. Using this information we make a selection of the columns to use as input for XGBoost. After the training, we decide to predict 0 for the unknown item id's and we submit the results on Kaggle obtaining an RMSE of 2.32279, which is better than the first strategy but we were hoping for better results
 - At this point we decide to use the same dataset of the previous step but we make a couple of hyperparameter tunings of the model, hoping to get better results this time. Firstly, we try to find the best parameters in a given space using a Coarse-To-Fine approach: we provide a space to the hyperopt library which selected some promising parameters of that region and after that we fine our research looking at a neighbourhood of these parameters with GidSearchCV. Even this case, our research is limited due to our poor computational resources. Probably because of this, actually we got a worse result: 2.34264. At this point, we simply try to tune the hyperparameters manually providing a larger number of trees: finally thins got better. Indeed, we have a final RMSE of 2.14894. The metric itself has improved comparing to the previous strategies (even if not so much), but in a production context we may consider this model as much more robust compared to the first approach because of the tree-based boosting approach of XGBoost and because in any case the model using the information both the month before and the year before, which is quite reasonable.
 
 ## Ideas for the future to improve the results
