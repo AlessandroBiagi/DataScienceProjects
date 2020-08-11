@@ -38,3 +38,4 @@ For the following ideas we assume that we want to try again XGBoost in order to 
 - We could apply a different feature selection, for example taking into account the lags number 1,2,3,6 and 12 and re-inserting the item_price of the month before
 - We could try to apply XGBoost without the features selection since we apply RFECV only to a 5% of our dataset and maybe we lost some leve of reliability
 - The RFECV algorithm and the coarse-to-fine approach have been limited a lot because of the computational resources. A possibility to get better results would be to re-launch the algorithms leaving the pc to work for several days
+- We could try to apply ARIMA(1,1,1) to the entire dataset and analyze the results
