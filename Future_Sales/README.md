@@ -17,7 +17,7 @@ Reference: This DataSet is public on Kaggle and you can find more details lookin
 **scripts**: the main code as jupyter notebook and a python file of Utils for custom functions <br>
 **src**: here the source files are stored <br>
 **submissions**: the files that we submit on Kaggle <br>
-**requirements.txt
+
 Additional info: we provide a requirements.txt with some particular versions of xgboost and matplotlib that we require
 
 
