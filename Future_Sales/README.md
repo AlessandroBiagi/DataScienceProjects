@@ -6,7 +6,7 @@ This project is a classical Data Science problem regarding numerical regression,
 **Number of features**: 32 <br>
 **Target label**: item_cnt_day, numerical <br>
 **Target metric**: RMSE as requested on the Kaggle web page <br>
-**Final model**: models/saved_models/tuned_models/xgb_manual.sav, with RMSE of 2.14894% <br>
+**Final model**: models/saved_models/tuned_models/xgb_manual.sav, with RMSE of 2.14894 <br>
 **Main code**: scripts/Predict_Future_Sales.ipynb <br>
 
 Reference: This DataSet is public on Kaggle and you can find more details looking at https://www.kaggle.com/c/competitive-data-science-predict-future-sales
