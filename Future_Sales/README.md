@@ -13,7 +13,7 @@ Reference: This DataSet is public on Kaggle and you can find more details lookin
 
 ## Table of contents of this repository
 **models**: here we can find the results of some of our Cross-Validations, the hyperparameters of our model and the saved models themselves <br>
-**plots**: histograms and boxplots of the features<br>
+**plots**: mainly histograms and boxplots of the features, but it also contains some exploratory charts looking for seasonalities<br>
 **scripts**: the main code as jupyter notebook and a python file of Utils for custom functions <br>
 **src**: here the source files are stored <br>
 **submissions**: the files that we submit on Kaggle <br>
