@@ -207,6 +207,7 @@ def creating_submission_lag(df_submission, df_xgb_sel, month):
     df_submission_lag = df_xgb_sel.copy()
     df_submission_lag = df_submission_lag[df_submission_lag['date_block_num'] == month]
     df_submission_lag = df_submission_lag[['joined_fields', 'item_cnt_day']]
+   
     df_submission = df_submission.merge(df_submission_lag, how='left',
                                         suffixes=('_left', 'right'), 
                                         left_on='joined_fields', right_on='joined_fields')
@@ -218,7 +219,8 @@ def creating_submission_file(df_test, df_xgb_sel, month, rename_old, rename_new)
     This function apply the creating_submission_lag function to a dataset and renames the columns according to the input
     """
     df_submission = creating_submission_lag(df_submission=df_test,
-                                           df_xgb_sel=df_xgb_sel, month=month)
+                                        df_xgb_sel=df_xgb_sel, month=month)
+        
     df_submission = df_submission.rename(columns={rename_old: rename_new})
     return df_submission
 
@@ -250,8 +252,8 @@ def parsing_trials_hp(trials, field):
     """
     By this function we parse the trials file given by hyperopt to obtain a visualization of the performance of the model with the tested hyperparameters
     """
-    field_value = [t['misc']['vals'][field] for t in trials.trials]
-    loss = [t['result']['loss'] for t in trials.trials]
+    field_value = [t['misc']['vals'][field] for t in trials]
+    loss = [t['result']['loss'] for t in trials]
     plt.xlabel(field)
     plt.ylabel('Loss')
     plt.title('Loss by ' + field)
@@ -266,8 +268,22 @@ def current_time():
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
     print("Current Time =", current_time)
-
+    
 # Number 16
+def extracting_trials_hp(param_list, trials, loss=None):
+    """
+    Given the results of a hyperopt search (the trials.trials object), we extract the most relevant parameters. We save them to a dictionary.
+    """
+    param_dict = {}
+    for param in param_list:
+        param_list = [t['misc']['vals'][param] for t in trials]
+        param_dict[param] = param_list
+    if loss:
+        param_list = [t['result']['loss'] * 100 for t in trials]
+        param_dict['loss'] = param_list
+    return param_dict
+
+# Number 17
 def extracting_parameters_xgb(xgb_model, model_name, fields, sep=';'):
     """
     Given an xgb model, we extract the desired parameters (listed in the fields input) and we save them on a csv file
@@ -278,3 +294,4 @@ def extracting_parameters_xgb(xgb_model, model_name, fields, sep=';'):
         dict_dataframe[field] = params[field]
     df_params = pd.DataFrame(dict_dataframe, index=[0])
     df_params.to_csv('models/hyperparameters/' + model_name + "_params", index=False, sep=sep)
+    
